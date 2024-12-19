@@ -25,13 +25,16 @@ let gameOver = false;
 
 // Load images
 const birdImg = new Image();
-birdImg.src = 'https://raw.githubusercontent.com/username/repository/branch/assets/images/flappybird.png';
+birdImg.src = 'https://raw.githubusercontent.com/Radzilp8/FlappyBird-1-1/main/assets/images/flappybird.png';
+
 const topPipeImg = new Image();
-topPipeImg.src = 'https://raw.githubusercontent.com/username/repository/branch/assets/images/toppipe.png';
+topPipeImg.src = 'https://raw.githubusercontent.com/Radzilp8/FlappyBird-1-1/main/assets/images/toppipe.png';
+
 const bottomPipeImg = new Image();
-bottomPipeImg.src = 'https://raw.githubusercontent.com/username/repository/branch/assets/images/bottompipe.png';
+bottomPipeImg.src = 'https://raw.githubusercontent.com/Radzilp8/FlappyBird-1-1/main/assets/images/bottompipe.png';
+
 const backgroundImg = new Image();
-backgroundImg.src = 'https://raw.githubusercontent.com/username/repository/branch/assets/images/flappybirdbg.png';
+backgroundImg.src = 'https://raw.githubusercontent.com/Radzilp8/FlappyBird-1-1/main/assets/images/flappybirdbg.png';
 
 // Game logic
 function drawBird() {
@@ -46,7 +49,7 @@ function drawPipes() {
 
 function movePipes() {
     pipes.forEach(pipe => {
-        pipe.x += -4; // Moving pipe to the left
+        pipe.x -= 4; // Moving pipe to the left
         if (pipe.x + PIPE_WIDTH < 0) {
             pipes.splice(pipes.indexOf(pipe), 1);
             if (!pipe.passed) {
@@ -60,18 +63,17 @@ function movePipes() {
 function spawnPipes() {
     const gap = 150;
     const randomY = Math.floor(Math.random() * (BOARD_HEIGHT - gap));
-    
+
     let topPipe = { x: BOARD_WIDTH, y: randomY - PIPE_HEIGHT, img: topPipeImg, passed: false };
     let bottomPipe = { x: BOARD_WIDTH, y: randomY + gap, img: bottomPipeImg, passed: false };
 
-    pipes.push(topPipe);
-    pipes.push(bottomPipe);
+    pipes.push(topPipe, bottomPipe);
 }
 
 function drawScore() {
     ctx.fillStyle = 'white';
     ctx.font = '32px Arial';
-    ctx.fillText('Score: ' + score, 10, 40);
+    ctx.fillText(`Score: ${score}`, 10, 40);
 }
 
 function gameOverScreen() {
@@ -90,7 +92,7 @@ function jump() {
 function moveBird() {
     velocityY += gravity;
     birdY += velocityY;
-    if (birdY > BOARD_HEIGHT - BIRD_HEIGHT) {
+    if (birdY > BOARD_HEIGHT - BIRD_HEIGHT || birdY < 0) {
         gameOver = true;
     }
 }
@@ -114,27 +116,24 @@ function gameLoop() {
 }
 
 function startGame() {
-    if (!gameOver) {
-        jump();
-        if (Math.random() < 0.02) {
-            spawnPipes();
-        }
-        gameLoop();
-    }
+    gameOver = false;
+    score = 0;
+    pipes = [];
+    birdY = BOARD_HEIGHT / 2;
+    velocityY = 0;
+    gameLoop();
 }
 
 // Event listener for spacebar (to jump)
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !gameOver) {
-        isJumping = true;
+    if (e.code === 'Space') {
+        if (gameOver) {
+            startGame();
+        } else {
+            isJumping = true;
+        }
     }
-    if (e.code === 'Space' && gameOver) {
-        gameOver = false;
-        score = 0;
-        pipes = [];
-        birdY = BOARD_HEIGHT / 2;
-        velocityY = 0;
-        startGame();
 });
 
+// Start the game
 startGame();
